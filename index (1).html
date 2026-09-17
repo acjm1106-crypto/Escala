@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.webmanifest">
+    <title>Escala Interativa de Operadores de Som – Setembro 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.4); border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(107, 114, 128, 0.7); }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full transition-colors duration-200 py-6 px-3 sm:px-6 lg:px-8">
+
+    <div class="max-w-6xl mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+        
+        <!-- Cabeçalho -->
+        <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 relative">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <span class="inline-block px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 rounded-full text-xs font-semibold tracking-wide uppercase mb-2">
+                        Painel de Controle de Som
+                    </span>
+                    <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight">ESCALA DE SETEMBRO – 2026</h1>
+                    <p class="text-indigo-200/80 mt-1 text-sm sm:text-base font-medium">Equipe de Operadores de Som</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 self-start md:self-auto">
+                    <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/10 text-sm flex items-center gap-2" title="Alternar tema">
+                        <span id="themeIcon">🌙</span>
+                        <span class="hidden sm:inline text-xs font-semibold" id="themeText">Escuro</span>
+                    </button>
+
+                    <button onclick="openPhotoModal()" class="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all border border-white/10 flex items-center gap-1.5" title="Alterar fotos dos operadores">
+                        <span>📷</span>
+                        <span class="hidden sm:inline">Alterar Fotos</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-4 sm:p-8 space-y-6">
+            
+            <!-- Barra de Busca e Filtros -->
+            <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                <!-- Campo de Busca -->
+                <div class="w-full lg:w-80 relative no-print">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                        🔍
+                    </span>
+                    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar por operador, dia ou data..." 
+                        class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white text-sm transition-all shadow-sm">
+                </div>
+
+                <!-- Filtros de Operadores -->
+                <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-2 lg:pb-0 no-print" id="operatorPills">
+                    <!-- Gerado via JS -->
+                </div>
+
+                <!-- Contador de Turnos -->
+                <div class="text-xs text-slate-600 dark:text-slate-300 font-semibold bg-white dark:bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm shrink-0 flex items-center justify-between lg:justify-start">
+                    <span>Turnos Exibidos:</span>
+                    <span id="turnCount" class="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm ml-2">0</span>
+                </div>
+            </div>
+
+            <!-- Tabela de Escala -->
+            <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm custom-scrollbar">
+                <table id="escalaTable" class="w-full text-left border-collapse min-w-[600px]">
+                    <thead>
+                        <tr class="bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 select-none">
+                            <th onclick="sortTable('dia')" class="py-3.5 px-4 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Dia da Semana <span id="sort-dia" class="text-slate-400 no-print">↕</span></th>
+                            <th onclick="sortTable('data')" class="py-3.5 px-4 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Data <span id="sort-data" class="text-slate-400 no-print">↕</span></th>
+                            <th onclick="sortTable('periodo')" class="py-3.5 px-4 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Período <span id="sort-periodo" class="text-slate-400 no-print">↕</span></th>
+                            <th onclick="sortTable('operador')" class="py-3.5 px-4 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Operador(es) <span id="sort-operador" class="text-slate-400 no-print">↕</span></th>
+                            <th class="py-3.5 px-4 text-center no-print">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700 text-sm" id="tableBody">
+                        <!-- Conteúdo gerado via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Resumo dos Operadores -->
+            <div class="mt-10">
+                <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-200 dark:border-slate-700">
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                        <span>📊</span> Total de Participações no Mês
+                    </h2>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Clique no card para detalhar</span>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5" id="summaryContainer">
+                    <!-- Cards gerados via JS -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Rodapé -->
+        <footer class="bg-slate-50 dark:bg-slate-900/50 py-4 px-6 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span>Escala oficial de Operadores de Som • Setembro de 2026</span>
+            <span class="text-slate-400">Sistema Interativo Web</span>
+        </footer>
+    </div>
+
+    <!-- Modal Adicionar/Editar Turno -->
+    <div id="shiftModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700">
+            <h3 id="modalTitle" class="text-xl font-bold text-slate-900 dark:text-white mb-4">Editar Turno</h3>
+            
+            <form id="shiftForm" onsubmit="handleShiftSubmit(event)" class="space-y-4">
+                <input type="hidden" id="editIndex" value="-1">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase mb-1">Dia da Semana</label>
+                    <select id="modalDia" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white text-sm focus:ring-2 focus:ring-indigo-500">
+                        <option value="Terça-feira">Terça-feira</option>
+                        <option value="Sexta-feira">Sexta-feira</option>
+                        <option value="Domingo">Domingo</option>
+                        <option value="Quarta-feira">Quarta-feira</option>
+                        <option value="Sábado">Sábado</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase mb-1">Data (DD/MM/AAAA)</label>
+                    <input type="text" id="modalData" placeholder="01/09/2026" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white text-sm focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase mb-1">Período</label>
+                    <select id="modalPeriodo" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white text-sm focus:ring-2 focus:ring-indigo-500">
+                        <option value="—">— (Geral / Culto)</option>
+                        <option value="Manhã">Manhã</option>
+                        <option value="Noite">Noite</option>
+                        <option value="Tarde">Tarde</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase mb-1">Operador(es)</label>
+                    <input type="text" id="modalOperador" placeholder="Ex: João / Davi" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white text-sm focus:ring-2 focus:ring-indigo-500">
+                    <p class="text-[11px] text-slate-400 mt-1">Use a barra " / " para separar mais de um operador.</p>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeShiftModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs hover:bg-slate-300 dark:hover:bg-slate-600 transition-all">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-all shadow-md">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes do Operador -->
+    <div id="operatorDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 relative">
+            <button onclick="closeOperatorModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg">✕</button>
+            
+            <div class="flex items-center gap-3 mb-4" id="opDetailHeader">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Dias Escalados neste mês:</h4>
+            <div id="opDetailList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-end">
+                <button onclick="filterByOperatorFromModal()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-all">Filtrar na Tabela</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gerenciador de Fotos dos Operadores -->
+    <div id="photoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 relative">
+            <button onclick="closePhotoModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg">✕</button>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                <span>📷</span> Fotos dos Operadores
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Qualquer foto enviada será salva como o novo padrão permanente.</p>
+            
+            <div id="photoOperatorsList" class="space-y-3 max-h-80 overflow-y-auto custom-scrollbar pr-1">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <button onclick="saveCurrentPhotosAsDefault()" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold flex items-center gap-1">
+                    💾 Confirmar Fotos Padrão
+                </button>
+                <button onclick="closePhotoModal()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-all">Concluído</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50 text-xs sm:text-sm border border-slate-700">
+        <span id="toastIcon">✨</span>
+        <span id="toastMessage">Ação concluída com sucesso!</span>
+    </div>
+
+    <script>
+        let defaultFotosBase = {
+            "João": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%234f46e5'/><circle cx='50' cy='36' r='18' fill='%23f3f4f6'/><path d='M20 88c0-16 13-28 30-28s30 12 30 28' fill='%23f3f4f6'/><path d='M28 36c0-14 9-22 22-22s22 8 22 22v6a4 4 0 0 1-4 4h-4v-16h8c0-10-6-14-16-14s-16 4-16 14h8v16h-4a4 4 0 0 1-4-4z' fill='%23312e81'/></svg>",
+            "Davi": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%23059669'/><circle cx='50' cy='36' r='18' fill='%23f3f4f6'/><path d='M20 88c0-16 13-28 30-28s30 12 30 28' fill='%23f3f4f6'/><rect x='34' y='32' width='12' height='10' rx='2' fill='none' stroke='%23064e3b' stroke-width='3'/><rect x='54' y='32' width='12' height='10' rx='2' fill='none' stroke='%23064e3b' stroke-width='3'/><line x1='46' y1='37' x2='54' y2='37' stroke='%23064e3b' stroke-width='3'/></svg>",
+            "Zildo": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%23d97706'/><circle cx='50' cy='36' r='18' fill='%23f3f4f6'/><path d='M20 88c0-16 13-28 30-28s30 12 30 28' fill='%23f3f4f6'/><path d='M35 42c0 8 6 14 15 14s15-6 15-14' fill='%2378350f'/><path d='M28 26c0 0 10-8 22-8s22 8 22 8-10-3-22-3-22 3-22 3z' fill='%2378350f'/></svg>",
+            "Fábio": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%237c3aed'/><circle cx='50' cy='36' r='18' fill='%23f3f4f6'/><path d='M20 88c0-16 13-28 30-28s30 12 30 28' fill='%23f3f4f6'/><circle cx='50' cy='28' r='7' fill='%234c1d95'/><path d='M44 28a6 6 0 0 0 12 0' stroke='%234c1d95' stroke-width='2' fill='none'/><line x1='50' y1='34' x2='50' y2='38' stroke='%234c1d95' stroke-width='2'/></svg>",
+            "Guinho": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%23e11d48'/><circle cx='50' cy='36' r='18' fill='%23f3f4f6'/><path d='M20 88c0-16 13-28 30-28s30 12 30 28' fill='%23f3f4f6'/><path d='M30 28c5-10 18-10 23-2c4-6 15-6 17 2c1 7-6 10-18 10s-18-4-22-10z' fill='%23881337'/></svg>"
+        };
+
+        // Carrega o padrão personalizado caso exista, ou as fotos ativas
+        let customDefaultFotos = JSON.parse(localStorage.getItem('operadorFotos_padrao_v1')) || defaultFotosBase;
+        let operadorFotos = JSON.parse(localStorage.getItem('operadorFotos_v1')) || customDefaultFotos;
+
+        // Dados originais
+        let escalaData = [
+            { id: 1, dia: "Terça-feira", data: "01/09/2026", periodo: "—", operador: "Guinho" },
+            { id: 2, dia: "Sexta-feira", data: "04/09/2026", periodo: "—", operador: "João / Davi" },
+            { id: 3, dia: "Domingo", data: "06/09/2026", periodo: "Manhã", operador: "João / Zildo" },
+            { id: 4, dia: "Domingo", data: "06/09/2026", periodo: "Noite", operador: "Zildo / Davi" },
+            { id: 5, dia: "Terça-feira", data: "08/09/2026", periodo: "—", operador: "Guinho" },
+            { id: 6, dia: "Sexta-feira", data: "11/09/2026", periodo: "—", operador: "João / Davi" },
+            { id: 7, dia: "Domingo", data: "13/09/2026", periodo: "Manhã", operador: "Fábio / Davi" },
+            { id: 8, dia: "Domingo", data: "13/09/2026", periodo: "Noite", operador: "João / Fábio" },
+            { id: 9, dia: "Terça-feira", data: "15/09/2026", periodo: "—", operador: "Guinho" },
+            { id: 10, dia: "Sexta-feira", data: "18/09/2026", periodo: "—", operador: "João" },
+            { id: 11, dia: "Domingo", data: "20/09/2026", periodo: "Manhã", operador: "João / Zildo" },
+            { id: 12, dia: "Domingo", data: "20/09/2026", periodo: "Noite", operador: "Zildo / Davi" },
+            { id: 13, dia: "Terça-feira", data: "22/09/2026", periodo: "—", operador: "Guinho" },
+            { id: 14, dia: "Sexta-feira", data: "25/09/2026", periodo: "—", operador: "João / Davi" },
+            { id: 15, dia: "Domingo", data: "27/09/2026", periodo: "Manhã", operador: "Fábio / Davi" },
+            { id: 16, dia: "Domingo", data: "27/09/2026", periodo: "Noite", operador: "João / Fábio" },
+            { id: 17, dia: "Terça-feira", data: "29/09/2026", periodo: "—", operador: "Guinho" }
+        ];
+
+        let selectedOperatorFilter = "TODOS";
+        let currentSortColumn = null;
+        let sortAscending = true;
+        let selectedModalOperator = "";
+
+        function getAvatarUrl(nome) {
+            if (operadorFotos[nome]) return operadorFotos[nome];
+            const initial = encodeURIComponent((nome || '?').charAt(0).toUpperCase());
+            return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%236366f1'/><text x='50' y='63' font-size='42' font-family='sans-serif' font-weight='bold' fill='%23ffffff' text-anchor='middle'>${initial}</text></svg>`;
+        }
+
+        function formatarOperadorHTML(textoOperador) {
+            let nomes = textoOperador.split(" / ");
+            return nomes.map(nomeTrim => {
+                let nome = nomeTrim.trim();
+                let fotoUrl = getAvatarUrl(nome);
+                return `
+                    <span onclick="event.stopPropagation(); setOperatorFilter('${nome}')" 
+                          class="inline-flex items-center gap-1.5 mr-1.5 my-1 bg-slate-100 dark:bg-slate-700/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:border-indigo-300 transition-all px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-600 shadow-sm cursor-pointer group">
+                        <img src="${fotoUrl}" alt="${nome}" class="w-5 h-5 rounded-full object-cover border border-slate-300 dark:border-slate-500">
+                        <span class="font-semibold text-slate-700 dark:text-slate-200 text-xs group-hover:text-indigo-600 dark:group-hover:text-indigo-400">${nome}</span>
+                    </span>
+                `;
+            }).join('');
+        }
+
+        function renderTable(dataToRender = escalaData) {
+            const tbody = document.getElementById("tableBody");
+            tbody.innerHTML = "";
+
+            if (dataToRender.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-10 text-center text-slate-400 dark:text-slate-500 font-medium">
+                            Nenhum turno encontrado com os filtros atuais.
+                        </td>
+                    </tr>
+                `;
+                document.getElementById("turnCount").innerText = 0;
+                return;
+            }
+
+            dataToRender.forEach((item, index) => {
+                const tr = document.createElement("tr");
+                tr.className = index % 2 === 0 
+                    ? "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors" 
+                    : "bg-slate-50/60 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-750 transition-colors";
+
+                let badgeClass = "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300";
+                if (item.periodo === 'Manhã') badgeClass = "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50";
+                if (item.periodo === 'Noite') badgeClass = "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50";
+
+                tr.innerHTML = `
+                    <td class="py-3.5 px-4 font-semibold text-slate-700 dark:text-slate-200">${item.dia}</td>
+                    <td class="py-3.5 px-4 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">${item.data}</td>
+                    <td class="py-3.5 px-4">
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg ${badgeClass}">
+                            ${item.periodo}
+                        </span>
+                    </td>
+                    <td class="py-2 px-4">${formatarOperadorHTML(item.operador)}</td>
+                    <td class="py-2 px-4 text-center no-print">
+                        <div class="flex items-center justify-center gap-1">
+                            <button onclick="openEditModal(${item.id})" class="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700" title="Editar">
+                                ✏️
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById("turnCount").innerText = dataToRender.length;
+        }
+
+        function getUniqueOperators() {
+            const set = new Set();
+            escalaData.forEach(item => {
+                item.operador.split(" / ").forEach(op => set.add(op.trim()));
+            });
+            return Array.from(set).sort();
+        }
+
+        function renderOperatorPills() {
+            const container = document.getElementById("operatorPills");
+            const operators = getUniqueOperators();
+            
+            let html = `
+                <button onclick="setOperatorFilter('TODOS')" 
+                        class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${selectedOperatorFilter === 'TODOS' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'}">
+                    Todos
+                </button>
+            `;
+
+            operators.forEach(op => {
+                const isSelected = selectedOperatorFilter === op;
+                html += `
+                    <button onclick="setOperatorFilter('${op}')" 
+                            class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 ${isSelected ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'}">
+                        <span>${op}</span>
+                    </button>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function calculateSummary() {
+            const counts = {};
+            getUniqueOperators().forEach(op => counts[op] = 0);
+
+            escalaData.forEach(item => {
+                item.operador.split(" / ").forEach(op => {
+                    const nome = op.trim();
+                    if (counts[nome] !== undefined) {
+                        counts[nome]++;
+                    } else {
+                        counts[nome] = 1;
+                    }
+                });
+            });
+
+            return Object.keys(counts).map(nome => ({ nome, total: counts[nome] })).sort((a,b) => b.total - a.total);
+        }
+
+        function renderSummary() {
+            const container = document.getElementById("summaryContainer");
+            container.innerHTML = "";
+
+            const summaryList = calculateSummary();
+
+            summaryList.forEach(item => {
+                let fotoUrl = getAvatarUrl(item.nome);
+                const isSelected = selectedOperatorFilter === item.nome;
+
+                const card = document.createElement("div");
+                card.onclick = () => openOperatorDetailModal(item.nome);
+                card.className = `bg-white dark:bg-slate-800 p-3.5 rounded-xl border ${isSelected ? 'border-indigo-500 ring-2 ring-indigo-500/30' : 'border-slate-200 dark:border-slate-700'} shadow-sm flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer group relative overflow-hidden`;
+                
+                card.innerHTML = `
+                    <img src="${fotoUrl}" alt="${item.nome}" class="w-12 h-12 rounded-full object-cover border-2 border-indigo-600 dark:border-indigo-400 shadow-sm mb-2 group-hover:scale-105 transition-transform">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">${item.nome}</h3>
+                    <p class="text-indigo-600 dark:text-indigo-400 font-extrabold text-base mt-0.5">${item.total} <span class="text-[11px] font-normal text-slate-400 dark:text-slate-400">turnos</span></p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function setOperatorFilter(operator) {
+            selectedOperatorFilter = operator;
+            renderOperatorPills();
+            filterTable();
+            renderSummary();
+        }
+
+        function filterTable() {
+            const query = document.getElementById("searchInput").value.toLowerCase().trim();
+
+            const filtered = escalaData.filter(item => {
+                const matchesQuery = item.dia.toLowerCase().includes(query) ||
+                                     item.data.toLowerCase().includes(query) ||
+                                     item.periodo.toLowerCase().includes(query) ||
+                                     item.operador.toLowerCase().includes(query);
+
+                const matchesOperator = selectedOperatorFilter === "TODOS" || 
+                                         item.operador.split(" / ").map(s => s.trim()).includes(selectedOperatorFilter);
+
+                return matchesQuery && matchesOperator;
+            });
+
+            renderTable(filtered);
+        }
+
+        function sortTable(columnKey) {
+            if (currentSortColumn === columnKey) {
+                sortAscending = !sortAscending;
+            } else {
+                currentSortColumn = columnKey;
+                sortAscending = true;
+            }
+
+            ['dia', 'data', 'periodo', 'operador'].forEach(col => {
+                const el = document.getElementById(`sort-${col}`);
+                if (el) el.innerText = col === columnKey ? (sortAscending ? '↑' : '↓') : '↕';
+            });
+
+            escalaData.sort((a, b) => {
+                let valA = a[columnKey].toLowerCase();
+                let valB = b[columnKey].toLowerCase();
+
+                if (columnKey === 'data') {
+                    const partsA = a.data.split('/');
+                    const partsB = b.data.split('/');
+                    valA = new Date(partsA[2], partsA[1] - 1, partsA[0]).getTime();
+                    valB = new Date(partsB[2], partsB[1] - 1, partsB[0]).getTime();
+                }
+
+                if (valA < valB) return sortAscending ? -1 : 1;
+                if (valA > valB) return sortAscending ? 1 : -1;
+                return 0;
+            });
+
+            filterTable();
+        }
+
+        function openPhotoModal() {
+            const container = document.getElementById("photoOperatorsList");
+            const operators = getUniqueOperators();
+
+            container.innerHTML = operators.map(op => {
+                const fotoUrl = getAvatarUrl(op);
+                return `
+                    <div class="flex items-center justify-between gap-3 p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center gap-3">
+                            <img src="${fotoUrl}" id="modalAvatar_${op}" class="w-10 h-10 rounded-full object-cover border border-indigo-500 shrink-0">
+                            <span class="font-bold text-xs text-slate-800 dark:text-slate-200">${op}</span>
+                        </div>
+                        <label class="px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 font-semibold text-xs rounded-lg border border-indigo-200 dark:border-indigo-800 cursor-pointer transition-all">
+                            Escolher Foto
+                            <input type="file" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, '${op}')">
+                        </label>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById("photoModal").classList.remove("hidden");
+            document.getElementById("photoModal").classList.add("flex");
+        }
+
+        function closePhotoModal() {
+            document.getElementById("photoModal").classList.add("hidden");
+            document.getElementById("photoModal").classList.remove("flex");
+        }
+
+        function handlePhotoUpload(event, opName) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const result = e.target.result;
+                operadorFotos[opName] = result;
+                localStorage.setItem('operadorFotos_v1', JSON.stringify(operadorFotos));
+                
+                const img = document.getElementById(`modalAvatar_${opName}`);
+                if (img) img.src = result;
+
+                renderTable();
+                renderSummary();
+                showToast(`Foto de ${opName} atualizada!`, "📷");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveCurrentPhotosAsDefault() {
+            localStorage.setItem('operadorFotos_padrao_v1', JSON.stringify(operadorFotos));
+            showToast("Fotos atuais salvas como novo padrão!", "💾");
+        }
+
+        function openEditModal(id) {
+            const item = escalaData.find(s => s.id === id);
+            if (!item) return;
+
+            document.getElementById("modalTitle").innerText = "Editar Turno";
+            document.getElementById("editIndex").value = id;
+            document.getElementById("modalDia").value = item.dia;
+            document.getElementById("modalData").value = item.data;
+            document.getElementById("modalPeriodo").value = item.periodo;
+            document.getElementById("modalOperador").value = item.operador;
+
+            document.getElementById("shiftModal").classList.remove("hidden");
+            document.getElementById("shiftModal").classList.add("flex");
+        }
+
+        function closeShiftModal() {
+            document.getElementById("shiftModal").classList.add("hidden");
+            document.getElementById("shiftModal").classList.remove("flex");
+        }
+
+        function handleShiftSubmit(event) {
+            event.preventDefault();
+            const editId = parseInt(document.getElementById("editIndex").value);
+            const dia = document.getElementById("modalDia").value;
+            const data = document.getElementById("modalData").value;
+            const periodo = document.getElementById("modalPeriodo").value;
+            const operador = document.getElementById("modalOperador").value;
+
+            const newShift = {
+                id: editId > 0 ? editId : Date.now(),
+                dia,
+                data,
+                periodo,
+                operador
+            };
+
+            if (editId > 0) {
+                const index = escalaData.findIndex(s => s.id === editId);
+                if (index !== -1) escalaData[index] = newShift;
+                showToast("Turno atualizado com sucesso!");
+            } else {
+                escalaData.push(newShift);
+                showToast("Novo turno adicionado com sucesso!");
+            }
+
+            closeShiftModal();
+            renderOperatorPills();
+            renderSummary();
+            filterTable();
+        }
+
+        function openOperatorDetailModal(operatorName) {
+            selectedModalOperator = operatorName;
+            const avatarUrl = getAvatarUrl(operatorName);
+            const opShifts = escalaData.filter(item => item.operador.split(" / ").map(s=>s.trim()).includes(operatorName));
+
+            document.getElementById("opDetailHeader").innerHTML = `
+                <img src="${avatarUrl}" class="w-12 h-12 rounded-full object-cover border-2 border-indigo-600">
+                <div>
+                    <h3 class="font-bold text-slate-900 dark:text-white text-base">${operatorName}</h3>
+                    <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">${opShifts.length} turnos escalados</p>
+                </div>
+            `;
+
+            const listContainer = document.getElementById("opDetailList");
+            listContainer.innerHTML = opShifts.map(s => `
+                <div class="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-xs flex justify-between items-center">
+                    <div>
+                        <span class="font-semibold text-slate-800 dark:text-slate-200">${s.dia} (${s.data})</span>
+                        <span class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold ${s.periodo === 'Manhã' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' : s.periodo === 'Noite' ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}">${s.periodo}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById("operatorDetailModal").classList.remove("hidden");
+            document.getElementById("operatorDetailModal").classList.add("flex");
+        }
+
+        function closeOperatorModal() {
+            document.getElementById("operatorDetailModal").classList.add("hidden");
+            document.getElementById("operatorDetailModal").classList.remove("flex");
+        }
+
+        function filterByOperatorFromModal() {
+            closeOperatorModal();
+            setOperatorFilter(selectedModalOperator);
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            document.getElementById("themeIcon").innerText = isDark ? "☀️" : "🌙";
+            document.getElementById("themeText").innerText = isDark ? "Claro" : "Escuro";
+        }
+
+        function showToast(msg, icon = "✨") {
+            const toast = document.getElementById("toast");
+            document.getElementById("toastMessage").innerText = msg;
+            document.getElementById("toastIcon").innerText = icon;
+
+            toast.classList.remove("translate-y-20", "opacity-0");
+            toast.classList.add("translate-y-0", "opacity-100");
+
+            setTimeout(() => {
+                toast.classList.remove("translate-y-0", "opacity-100");
+                toast.classList.add("translate-y-20", "opacity-0");
+            }, 3000);
+        }
+
+        // Inicialização
+        window.onload = function() {
+            renderOperatorPills();
+            renderTable();
+            renderSummary();
+        };
+    </script>
+<script>
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+            navigator.serviceWorker.register("sw.js").catch(() => {});
+        });
+    }
+</script>
+</body>
+</html>
