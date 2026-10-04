@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.webmanifest">
+    <title>Escala Interativa de Operadores de Som – Outubro 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.4); border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(107, 114, 128, 0.7); }
+    </style>
+    <style id="reference-design">
+        body { padding: 6px !important; background: #edf2f7 !important; color: #10213b !important; }
+        body > div.max-w-6xl { max-width: 1280px !important; border-radius: 12px !important; box-shadow: 0 5px 16px rgba(15, 23, 42, .12) !important; }
+        header { padding: 26px !important; background: linear-gradient(110deg,#111a32,#171944 55%,#10192b) !important; }
+        header h1 { font-size: 29px !important; letter-spacing: -.04em !important; }
+        header > div { align-items: center !important; }
+        header span.inline-block { font-size: 10px !important; padding: 3px 10px !important; margin-bottom: 5px !important; }
+        header p { font-size: 13px !important; margin-top: 2px !important; }
+        body > div.max-w-6xl > div.p-4 { padding: 26px !important; gap: 18px !important; }
+        body > div.max-w-6xl > div.p-4 > div:first-child { padding: 12px !important; background: #f7f9fc !important; border-radius: 12px !important; }
+        #searchInput { border-radius: 10px !important; padding-top: 7px !important; padding-bottom: 7px !important; }
+        #operatorPills { gap: 5px !important; }
+        #operatorPills button { border-radius: 999px !important; padding: 5px 11px !important; font-size: 10px !important; }
+        #turnCount { border-radius: 10px !important; }
+        #escalaTable thead tr { background: #f1f5f9 !important; }
+        #escalaTable th { padding: 10px 12px !important; font-size: 9px !important; }
+        #escalaTable tbody tr { height: 44px !important; }
+        #escalaTable tbody td { padding: 7px 12px !important; font-size: 11px !important; }
+        #escalaTable tbody td:first-child { font-weight: 600 !important; color: #10213b !important; }
+        #escalaTable tbody td:nth-child(2) { color: #263b58 !important; }
+        #escalaTable tbody td:nth-child(3) span { padding: 3px 8px !important; border-radius: 6px !important; font-size: 10px !important; }
+        #escalaTable tbody td:nth-child(4) > span { margin-top: 0 !important; margin-bottom: 0 !important; margin-right: 4px !important; padding: 2px 8px 2px 5px !important; gap: 5px !important; }
+        #escalaTable tbody td:nth-child(4) img { width: 16px !important; height: 16px !important; }
+        #escalaTable tbody td:nth-child(4) span span { font-size: 10px !important; }
+        #escalaTable tbody td:nth-child(5) button { color: #ff704d !important; }
+        #summaryContainer { gap: 10px !important; }
+        #summaryContainer > div { padding: 10px !important; border-radius: 10px !important; }
+        #summaryContainer img { width: 38px !important; height: 38px !important; }
+        #summaryContainer h3 { font-size: 11px !important; }
+        #summaryContainer p { font-size: 12px !important; margin-top: 0 !important; }
+        footer { padding: 12px 20px !important; font-size: 9px !important; }
+        html.dark body { background: #0f172a !important; color: #e2e8f0 !important; }
+        @media (max-width: 640px) {
+            body > div.max-w-6xl > div.p-4 { padding: 14px !important; }
+            header { padding: 20px !important; }
+            header h1 { font-size: 24px !important; }
+            #operatorPills { max-width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full transition-colors duration-200 py-6 px-3 sm:px-6 lg:px-8">
+
+    <div class="max-w-6xl mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+        
+        <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 relative">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <span class="inline-block px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 rounded-full text-xs font-semibold tracking-wide uppercase mb-2">
+                        Painel de Controle de Som
+                    </span>
+                    <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight">ESCALA DE OUTUBRO – 2026</h1>
+                    <p class="text-indigo-200/80 mt-1 text-sm sm:text-base font-medium">Equipe de Operadores de Som</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 self-start md:self-auto">
+                    <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/10 text-sm flex items-center gap-2" title="Alternar tema">
+                        <span id="themeIcon">🌙</span>
+                        <span class="hidden sm:inline text-xs font-semibold" id="themeText">Escuro</span>
+                    </button>
+
+                    <button onclick="openPhotoModal()" class="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all border border-white/10 flex items-center gap-1.5" title="Alterar fotos dos operadores">
+                        <span>📷</span>
+                        <span class="hidden sm:inline">Alterar Fotos</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-4 sm:p-8 space-y-6">
+            
+            <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                <!-- Campo de Busca -->
+                <div class="w-full lg:w-80 relative no-print">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                        🔍
+                    </span>
+                    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar por operador, dia ou data..." 
+                        class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white text-sm transition-all shadow-sm">
+                </div>
+
+                <!-- Filtros de Operadores -->
+                <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-2 lg:pb-0 no-print" id="operatorPills">
+                    <!-- Gerado via JS -->
+                </div>
+
+                <!-- Contador de Turnos -->
+                <div class="text-xs text-slate-600 dark:text-slate-300 font-semibold bg-white dark:bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm shrink-0 flex items-center justify-between lg:justify-start">
+                    <span>Turnos Exibidos:</span>
+                    <span id="turnCount" class="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm ml-2">0</span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm custom-scrollbar">
+                <table id="escalaTable" class="w-full text-left border-collapse min-w-[600px]">
+                    <thead>
+                        <tr class="bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 select-none">
+                            <th onclick="sortTable('dia')" class="py-3.5 px-4 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Dia da Semana <span id="sort-dia" class="text-slate-400 no-print">↕</span></th>
+                            <th onclick="sortTable('data')" class="py-3.5 px-4 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Data <span id="sort-data" class="text-slate-400 no-print">↕</span></th>
+                            <th onclick="sortTable('periodo')" class="py-3.5 px-4 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Período <span id="sort-periodo" class="text-slate-400 no-print">↕</span></th>
+                            <th onclick="sortTable('operador')" class="py-3.5 px-4 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Operador(es) <span id="sort-operador" class="text-slate-400 no-print">↕</span></th>
+                            <th class="py-3.5 px-4 text-center no-print">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700 text-sm" id="tableBody">
+                        <!-- Conteúdo gerado via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-10">
+                <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-200 dark:border-slate-700">
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                        <span>📊</span> Total de Participações no Mês
+                    </h2>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Clique no card para detalhar</span>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5" id="summaryContainer">
+                    <!-- Cards gerados via JS -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Rodapé -->
+        <footer class="bg-slate-50 dark:bg-slate-900/50 py-4 px-6 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span>Escala oficial de Operadores de Som • Outubro de 2026</span>
+            <span class="text-slate-400">Sistema Interativo Web</span>
+        </footer>
+    </div>
+
+    <!-- Modal Adicionar/Editar Turno -->
+    <div id="shiftModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700">
+            <h3 id="modalTitle" class="text-xl font-bold text-slate-900 dark:text-white mb-4">Editar Turno</h3>
+            
+            <form id="shiftForm" onsubmit="handleShiftSubmit(event)" class="space-y-4">
+                <input type="hidden" id="editIndex" value="-1">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase mb-1">Dia da Semana</label>
+                    <select id="modalDia" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white text-sm focus:ring-2 focus:ring-indigo-500">
+                        <option value="Terça-feira">Terça-feira</option>
+                        <option value="Sexta-feira">Sexta-feira</option>
+                        <option value="Domingo">Domingo</option>
+                        <option value="Quarta-feira">Quarta-feira</option>
+                        <option value="Sábado">Sábado</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase mb-1">Data (DD/MM/AAAA)</label>
+                    <input type="text" id="modalData" placeholder="02/10/2026" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white text-sm focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase mb-1">Período</label>
+                    <select id="modalPeriodo" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white text-sm focus:ring-2 focus:ring-indigo-500">
+                        <option value="—">— (Geral / Culto)</option>
+                        <option value="Manhã">Manhã</option>
+                        <option value="Noite">Noite</option>
+                        <option value="Tarde">Tarde</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase mb-1">Operador(es)</label>
+                    <input type="text" id="modalOperador" placeholder="Ex: João / Davi" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white text-sm focus:ring-2 focus:ring-indigo-500">
+                    <p class="text-[11px] text-slate-400 mt-1">Use a barra " / " para separar mais de um operador.</p>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeShiftModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs hover:bg-slate-300 dark:hover:bg-slate-600 transition-all">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-all shadow-md">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes do Operador -->
+    <div id="operatorDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 relative">
+            <button onclick="closeOperatorModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg">✕</button>
+            
+            <div class="flex items-center gap-3 mb-4" id="opDetailHeader">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Dias Escalados neste mês:</h4>
+            <div id="opDetailList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-end">
+                <button onclick="filterByOperatorFromModal()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-all">Filtrar na Tabela</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gerenciador de Fotos dos Operadores -->
+    <div id="photoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 relative">
+            <button onclick="closePhotoModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg">✕</button>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                <span>📷</span> Fotos dos Operadores
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Qualquer foto enviada será salva como o novo padrão permanente.</p>
+            
+            <div id="photoOperatorsList" class="space-y-3 max-h-80 overflow-y-auto custom-scrollbar pr-1">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <button onclick="saveCurrentPhotosAsDefault()" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold flex items-center gap-1">
+                    💾 Confirmar Fotos Padrão
+                </button>
+                <button onclick="closePhotoModal()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-all">Concluído</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50 text-xs sm:text-sm border border-slate-700">
+        <span id="toastIcon">✨</span>
+        <span id="toastMessage">Ação concluída com sucesso!</span>
+    </div>
+
+    <script>
+        let defaultFotosBase = {
+            "João": "data:image/jpeg;base64,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",
+            "Davi": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAB4AHgDASIAAhEBAxEB/8QAGwAAAQUBAQAAAAAAAAAAAAAABQACAwQGAQf/xAA6EAACAQMCAwYEBAQFBQAAAAABAgMABBESIQUxQQYTIlFxgRQyYaEjQpHBFVKx0SQzNOHwY4KSovH/xAAYAQEBAQEBAAAAAAAAAAAAAAACAwEABP/EACARAAICAwEBAAMBAAAAAAAAAAABAhESITFBAxMiYXH/2gAMAwEAAhEDEQA/AGrDcXRRv4bYvNKveYuSTIQeWdvpQjiFlxKxl03EYctuBG+vHr1FHYeEI5PxF4bmMENHrlZmHPO3XnQbiPCUs76RLVJijKCuULKM/WvLJJl4vZSxI8kYeORdjnIpl3lYdIyHLADH61I8otmddcrgfysUx9zUF1dsyJIqvnOrLEO3LzoqLsbkqCcMEU3D2+Lvu7lAyoI1ZPsc1US4toh3Yly3LLCgmuWaXClizGr0VhdFu60BWHPI3NWqiVtvRpuA8UtbGSR5Se9kGlHIGlfWtpqBQMragQDq8/rXnkXZq9IDvMiEdCc5HtRHs9fz2F+bC8Y92/hXfIU9MetckvDJJ9ZsS3iBJP61AGYrkkHPnttTpcgZFVkDFt5kJ6K21aAlE25JDKoHPGRUouGC5B1Z2VQdzUQExIDppUbnTuPtSmmVBkaTJjbPQVho9ZD37vIV/DG58qDy3neyNI53Y59BXbm57nhE5B8TZz7nFZ17l2/NU5qyvz1sNvPEy6SedKs3LdKvzSqPVqVHArmgpdXdgqy8PneP4jRgSd3qKnHSqA4XZOpD8Tc/T4Y1fa1aW7eYxLIJWzjQwKj65rksdmY3cXBDL8oxzptuPCWKl0FpbW1rNphDyx48RkQD7ZNULiIz3ndWi+EnAAol4xIGCv8A+NS8PVIr9z3ZUyDK56HrRT3YsdUEuE8Lt7FUJUNcDcsehok9vGCJJHUt1odJxKK38KeOT8wXp61XuJ5b61kMWoqo8WnpTxbVsSaXC/NxexVhEgkmYbZjXYe9RXcdveWTzxEd8m4YHfI6Gs8nfyMiLqVAflVeYrS8NheHOVYDAyrHJpNRi9B3JbC1hfC74dHIxAk04YZ6im3S65QEOCRkGqVxCVmiMSp3YHTOVx1FECAFjkxuu1ZeycoUk0UTdXcDFdbDB5U3XLcya3wWPh39KnnYzTHO+RlfpUMaFXj3yASTSVBKXELyOyPwtxE3jQMCoB2P/wArLcRvDqLAaNR8IyOVaTtZFmwt7sAkxnQ2B0PL7j71iLtjJINWBt9qxXZWWGCa6NVju3nSpuoClVDznqMN7w9rWErcQNLpGrvJMFdt9siqMq2MFz8dbvbynJ1Q94mGJ5nfkfSssLGaRykt7HG+dJVUYkHy5AferVlwV1uSl5IRG42cjH1B2zUqS9KbYek7SWMUoSbhqDI/K6MKfxHiPApLdxamN58eFokwVPryob/CODxyAveNkbABj/Tu6trw7g8QDNcSOo20eI5+wrGomq/QBPDIGMcOUTrtu1Gez8TQd6kp/DdRkHoakKfDRmUbhhqXkSAeW3SqBuJBExExAJyxYj96WTaorGKjsKXS28GkQPHqz4cc8elQ29+8VyA7E77561RQHdwSzvtkjA/3qW2tJwzTT5LHYDooo8H00gZGeKQkjGxANOkurXS8SzoZC2NOd8+lZ6O7ZX0FjtRu1gSV47qVAZVGFJ6CjL6WwP5k0dq4KyMwGAdqG8Yna0SNoZEBLYcspz7UZKqx8RJ+gOBVC8iuHhlW3kVtQICuMg/89KGTNUIgR+JvPbGCUBo23IK7mh81hYXLf5JRvMNj/aq0krKSjA5GxB2pyyhSBnc099M0VL3gMsOHt3MsZO+2CP70qM211+U7qaVPJh/HEfZ4e3VmwWZQST1NSJEqEtrkyds6yB+laKy7OwW8CoUaTAAy7cv0qX+DFoJIXjg7uToCTj7fvUIyc3x0c2l6ZjMRlKCT8Rea69xXVdZo9cbs6Alc6iRmi952f4fEA891DE3T8LJ9t8mqbCaYtZ8MtRJkYaQx92PXb+/tV5RhX6sEZSb3wbbYkheN/CB1NUjbWsxw8aOM7nFQTvPAHh71HOSrnJIPpnpQyaeSJGeJ2RwNt/6UIplm9GhW3WKTRH4RVqSaO3hOth8tZuDjkjBUuAoOMd4P3Fduu8lXLS6h5Upf05T1ovcOha8uWmbIjzWoMwiBLDAOAFzvQjg+ba0BK5CjO/nQvi3GjAxZ8tI2cDyqajbNbpBriXGFt4mZnCIP1rNntDJrJ77Sg/KASTQG6u5ruTVMxPkOgqIDIzVlBJEPyPwJLdNPMzynxOxYk9etKOUuzOTzO1UgcLt6VKp0oPM11GphETaWUA70qq6tVzpzypVlCs9As+2XB5IwDNLAeWJUJ39RmrUfF+Gu/etxGEt0LORj22rknZ7s7dHS1mEY7eF2GD7HFULjsjwmxf4ie6uVthsU1dfUDl7ViUX6Sdp7LVzccHmnE8nEoS68vHyqnfcU4doWODizI2rP4LP4z5HY/wBav2tv2VQZj+EY/wDUcsf/AGNXDL2fQZCcPGOqon9qWKMUmefXEuGJKkfeh88haM6QGHUVevSElZSQN/MVRljjzliFbzB3rEWlsHHUSCTyojwd5JbpIDug3P0xVKVAh2cMD1xWj7LcNDwS3chIDHSntz/59KU2sQQTsLRtpgdc7EVj+OtqvgPJf3rW3C92Cp+1Y7i5zfN6ChDo/pwpVINhTF+X3p4qjIo5nwn9aljbMq/QZqE7GpIm0ajz2xXGomhcJqkbnyHrSpkYzzPLpSois3rdrImDrYWSqxHzynOfYYoPPxG+4m/+PkjcLnTzUD2FaR+yNq0a93eyM2dtAVR981UuOzTWcUk0zakjUufxMZx6DmfKsWK0jHJ3Zm2tEVi6yBSeoJx/WoZpIoxgzhvouf71oYbK54lw147DhVvEkg0m4uFIK+mck+oplv2AZlzdcR36iOPI/Un9qa/0LkgLNM14GuFt9DAAauYPpUSwb4ILOaNX3DLbg8y2UBlkLBWy2/PIPIY6UV4XZw2iK+kNMwyWPT6CpSliWh+xm24FfTRbwFAeRcgY9udaOGJLO0jt4tlRdPrVu5mzgeW9D55PDzoW2OkitcsWJJrIcX/1zegrWSHPPrWX49gcQwP5B+9Uh0n9OFBfk966Odcj+U12qEjux2rmkkHHTnSqWABpVB5HY1xxLZQvcNojGT1PlSp3DZza3eG2DHS1KhK0ykarZ6rbPbFFmEpd/mAAK4rlxfyaWckgAZwOeKGWMMkCSB5FZT4lx+XPOpYXPwyOx57Fm5UtNWS9ouRcVBg0x+I/QZPOpluQZlWUMGI2yNqqieTUFWaPJ5KCKHSzztfHD4ZCACBq36bdanaZtFu4aC8vI0JkzrxjTscZqGVTbytGTy5elPRONyQu0YshKp2ZlKn7ZFZo8S4hb8Tlt+LRsr9WJyB5e1dKNofzlTC0kuWNVZX1GuRSh1LfWoppQMnBoJFmNd8HnWX4s/ecQkPkAPtRyafALE4rMyyd7M7nmxzVoLZL6M6nKnGmJsN6fS9Jo5XQcHIrlKuOLMqd6vfx/N+YUqhilMbZFKtNs9GSKcRtIbhlH5sgfv705UVYNLOAIyTk8v1pUqC5Rl2RGOXUzJLCNS+FcaiaYTFass6ttF4nzty35+1KlXRSObKt92yaNWW0SMOf+7+wrNPdT3oe4upGkkkJyW/SlSpxikjPSa24mYIxHKMheTedT/FJKpfUMetKlRcUUjJg2+nM34UALfzEf0ofLE8bLlcGlSpJUTe2cyxOTua7q6HalSrjRYHVqcEB60qVYaLuRSpUq06j/9k=",
+            "Zildo": "data:image/jpeg;base64,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",
+            "Fábio": "data:image/jpeg;base64,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",
+            "Guinho": "data:image/jpeg;base64,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"
+        };
+
+        let customDefaultFotos = JSON.parse(localStorage.getItem('operadorFotos_padrao_v4')) || defaultFotosBase;
+        let operadorFotos = JSON.parse(localStorage.getItem('operadorFotos_v4')) || customDefaultFotos;
+
+        // Dados originais - Escala Outubro 2026
+        let escalaData = [
+            { id: 1, dia: "Sexta-feira", data: "02/10/2026", periodo: "—", operador: "João / Davi" },
+            { id: 2, dia: "Domingo", data: "04/10/2026", periodo: "Manhã", operador: "João / Zildo" },
+            { id: 3, dia: "Domingo", data: "04/10/2026", periodo: "Noite", operador: "Fábio / Davi / João" },
+            { id: 4, dia: "Terça-feira", data: "06/10/2026", periodo: "—", operador: "João" },
+            { id: 5, dia: "Sexta-feira", data: "09/10/2026", periodo: "—", operador: "João / Davi" },
+            { id: 6, dia: "Domingo", data: "11/10/2026", periodo: "Manhã", operador: "Fábio / João" },
+            { id: 7, dia: "Domingo", data: "11/10/2026", periodo: "Noite", operador: "João / Zildo" },
+            { id: 8, dia: "Terça-feira", data: "13/10/2026", periodo: "—", operador: "Guinho" },
+            { id: 9, dia: "Sexta-feira", data: "16/10/2026", periodo: "—", operador: "João" },
+            { id: 10, dia: "Domingo", data: "18/10/2026", periodo: "Manhã", operador: "Davi / Zildo" },
+            { id: 11, dia: "Domingo", data: "18/10/2026", periodo: "Noite", operador: "Zildo / Davi" },
+            { id: 12, dia: "Terça-feira", data: "20/10/2026", periodo: "—", operador: "Guinho" },
+            { id: 13, dia: "Sexta-feira", data: "23/10/2026", periodo: "—", operador: "João / Davi" },
+            { id: 14, dia: "Domingo", data: "25/10/2026", periodo: "Manhã", operador: "Zildo / João" },
+            { id: 15, dia: "Domingo", data: "25/10/2026", periodo: "Noite", operador: "João / Fábio" },
+            { id: 16, dia: "Terça-feira", data: "27/10/2026", periodo: "—", operador: "Davi" },
+            { id: 17, dia: "Sexta-feira", data: "30/10/2026", periodo: "—", operador: "João / Davi" }
+        ];
+
+        let selectedOperatorFilter = "TODOS";
+        let currentSortColumn = null;
+        let sortAscending = true;
+        let selectedModalOperator = "";
+
+        function getAvatarUrl(nome) {
+            if (operadorFotos[nome]) return operadorFotos[nome];
+            const initial = encodeURIComponent((nome || '?').charAt(0).toUpperCase());
+            return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%236366f1'/><text x='50' y='63' font-size='42' font-family='sans-serif' font-weight='bold' fill='%23ffffff' text-anchor='middle'>${initial}</text></svg>`;
+        }
+
+        function formatarOperadorHTML(textoOperador) {
+            let nomes = textoOperador.split(" / ");
+            return nomes.map(nomeTrim => {
+                let nome = nomeTrim.trim();
+                let fotoUrl = getAvatarUrl(nome);
+                return `
+                    <span onclick="event.stopPropagation(); setOperatorFilter('${nome}')" 
+                          class="inline-flex items-center gap-1.5 mr-1.5 my-1 bg-slate-100 dark:bg-slate-700/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:border-indigo-300 transition-all px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-600 shadow-sm cursor-pointer group">
+                        <img src="${fotoUrl}" alt="${nome}" class="w-5 h-5 rounded-full object-cover border border-slate-300 dark:border-slate-500">
+                        <span class="font-semibold text-slate-700 dark:text-slate-200 text-xs group-hover:text-indigo-600 dark:group-hover:text-indigo-400">${nome}</span>
+                    </span>
+                `;
+            }).join('');
+        }
+
+        function renderTable(dataToRender = escalaData) {
+            const tbody = document.getElementById("tableBody");
+            tbody.innerHTML = "";
+
+            if (dataToRender.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-10 text-center text-slate-400 dark:text-slate-500 font-medium">
+                            Nenhum turno encontrado com os filtros atuais.
+                        </td>
+                    </tr>
+                `;
+                document.getElementById("turnCount").innerText = 0;
+                return;
+            }
+
+            dataToRender.forEach((item, index) => {
+                const tr = document.createElement("tr");
+                tr.className = index % 2 === 0 
+                    ? "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors" 
+                    : "bg-slate-50/60 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-750 transition-colors";
+
+                let badgeClass = "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300";
+                if (item.periodo === 'Manhã') badgeClass = "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50";
+                if (item.periodo === 'Noite') badgeClass = "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50";
+
+                tr.innerHTML = `
+                    <td class="py-3.5 px-4 font-semibold text-slate-700 dark:text-slate-200">${item.dia}</td>
+                    <td class="py-3.5 px-4 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">${item.data}</td>
+                    <td class="py-3.5 px-4">
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg ${badgeClass}">
+                            ${item.periodo}
+                        </span>
+                    </td>
+                    <td class="py-2 px-4">${formatarOperadorHTML(item.operador)}</td>
+                    <td class="py-2 px-4 text-center no-print">
+                        <div class="flex items-center justify-center gap-1">
+                            <button onclick="openEditModal(${item.id})" class="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700" title="Editar">
+                                ✏️
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById("turnCount").innerText = dataToRender.length;
+        }
+
+        function getUniqueOperators() {
+            const set = new Set();
+            escalaData.forEach(item => {
+                item.operador.split(" / ").forEach(op => set.add(op.trim()));
+            });
+            return Array.from(set).sort();
+        }
+
+        function renderOperatorPills() {
+            const container = document.getElementById("operatorPills");
+            const operators = getUniqueOperators();
+            
+            let html = `
+                <button onclick="setOperatorFilter('TODOS')" 
+                        class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${selectedOperatorFilter === 'TODOS' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'}">
+                    Todos
+                </button>
+            `;
+
+            operators.forEach(op => {
+                const isSelected = selectedOperatorFilter === op;
+                html += `
+                    <button onclick="setOperatorFilter('${op}')" 
+                            class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 ${isSelected ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'}">
+                        <span>${op}</span>
+                    </button>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function calculateSummary() {
+            const counts = {};
+            getUniqueOperators().forEach(op => counts[op] = 0);
+
+            escalaData.forEach(item => {
+                item.operador.split(" / ").forEach(op => {
+                    const nome = op.trim();
+                    if (counts[nome] !== undefined) {
+                        counts[nome]++;
+                    } else {
+                        counts[nome] = 1;
+                    }
+                });
+            });
+
+            return Object.keys(counts).map(nome => ({ nome, total: counts[nome] })).sort((a,b) => b.total - a.total);
+        }
+
+        function renderSummary() {
+            const container = document.getElementById("summaryContainer");
+            container.innerHTML = "";
+
+            const summaryList = calculateSummary();
+
+            summaryList.forEach(item => {
+                let fotoUrl = getAvatarUrl(item.nome);
+                const isSelected = selectedOperatorFilter === item.nome;
+
+                const card = document.createElement("div");
+                card.onclick = () => openOperatorDetailModal(item.nome);
+                card.className = `bg-white dark:bg-slate-800 p-3.5 rounded-xl border ${isSelected ? 'border-indigo-500 ring-2 ring-indigo-500/30' : 'border-slate-200 dark:border-slate-700'} shadow-sm flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer group relative overflow-hidden`;
+                
+                card.innerHTML = `
+                    <img src="${fotoUrl}" alt="${item.nome}" class="w-12 h-12 rounded-full object-cover border-2 border-indigo-600 dark:border-indigo-400 shadow-sm mb-2 group-hover:scale-105 transition-transform">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">${item.nome}</h3>
+                    <p class="text-indigo-600 dark:text-indigo-400 font-extrabold text-base mt-0.5">${item.total} <span class="text-[11px] font-normal text-slate-400 dark:text-slate-400">turnos</span></p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function setOperatorFilter(operator) {
+            selectedOperatorFilter = operator;
+            renderOperatorPills();
+            filterTable();
+            renderSummary();
+        }
+
+        function filterTable() {
+            const query = document.getElementById("searchInput").value.toLowerCase().trim();
+
+            const filtered = escalaData.filter(item => {
+                const matchesQuery = item.dia.toLowerCase().includes(query) ||
+                                     item.data.toLowerCase().includes(query) ||
+                                     item.periodo.toLowerCase().includes(query) ||
+                                     item.operador.toLowerCase().includes(query);
+
+                const matchesOperator = selectedOperatorFilter === "TODOS" || 
+                                         item.operador.split(" / ").map(s => s.trim()).includes(selectedOperatorFilter);
+
+                return matchesQuery && matchesOperator;
+            });
+
+            renderTable(filtered);
+        }
+
+        function sortTable(columnKey) {
+            if (currentSortColumn === columnKey) {
+                sortAscending = !sortAscending;
+            } else {
+                currentSortColumn = columnKey;
+                sortAscending = true;
+            }
+
+            ['dia', 'data', 'periodo', 'operador'].forEach(col => {
+                const el = document.getElementById(`sort-${col}`);
+                if (el) el.innerText = col === columnKey ? (sortAscending ? '↑' : '↓') : '↕';
+            });
+
+            escalaData.sort((a, b) => {
+                let valA = a[columnKey].toLowerCase();
+                let valB = b[columnKey].toLowerCase();
+
+                if (columnKey === 'data') {
+                    const partsA = a.data.split('/');
+                    const partsB = b.data.split('/');
+                    valA = new Date(partsA[2], partsA[1] - 1, partsA[0]).getTime();
+                    valB = new Date(partsB[2], partsB[1] - 1, partsB[0]).getTime();
+                }
+
+                if (valA < valB) return sortAscending ? -1 : 1;
+                if (valA > valB) return sortAscending ? 1 : -1;
+                return 0;
+            });
+
+            filterTable();
+        }
+
+        function openPhotoModal() {
+            const container = document.getElementById("photoOperatorsList");
+            const operators = getUniqueOperators();
+
+            container.innerHTML = operators.map(op => {
+                const fotoUrl = getAvatarUrl(op);
+                return `
+                    <div class="flex items-center justify-between gap-3 p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center gap-3">
+                            <img src="${fotoUrl}" id="modalAvatar_${op}" class="w-10 h-10 rounded-full object-cover border border-indigo-500 shrink-0">
+                            <span class="font-bold text-xs text-slate-800 dark:text-slate-200">${op}</span>
+                        </div>
+                        <label class="px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 font-semibold text-xs rounded-lg border border-indigo-200 dark:border-indigo-800 cursor-pointer transition-all">
+                            Escolher Foto
+                            <input type="file" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, '${op}')">
+                        </label>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById("photoModal").classList.remove("hidden");
+            document.getElementById("photoModal").classList.add("flex");
+        }
+
+        function closePhotoModal() {
+            document.getElementById("photoModal").classList.add("hidden");
+            document.getElementById("photoModal").classList.remove("flex");
+        }
+
+        function handlePhotoUpload(event, opName) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const result = e.target.result;
+                operadorFotos[opName] = result;
+                localStorage.setItem('operadorFotos_v4', JSON.stringify(operadorFotos));
+                
+                const img = document.getElementById(`modalAvatar_${opName}`);
+                if (img) img.src = result;
+
+                renderTable();
+                renderSummary();
+                showToast(`Foto de ${opName} atualizada!`, "📷");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveCurrentPhotosAsDefault() {
+            localStorage.setItem('operadorFotos_padrao_v4', JSON.stringify(operadorFotos));
+            showToast("Fotos atuais salvas como novo padrão!", "💾");
+        }
+
+        function openEditModal(id) {
+            const item = escalaData.find(s => s.id === id);
+            if (!item) return;
+
+            document.getElementById("modalTitle").innerText = "Editar Turno";
+            document.getElementById("editIndex").value = id;
+            document.getElementById("modalDia").value = item.dia;
+            document.getElementById("modalData").value = item.data;
+            document.getElementById("modalPeriodo").value = item.periodo;
+            document.getElementById("modalOperador").value = item.operador;
+
+            document.getElementById("shiftModal").classList.remove("hidden");
+            document.getElementById("shiftModal").classList.add("flex");
+        }
+
+        function closeShiftModal() {
+            document.getElementById("shiftModal").classList.add("hidden");
+            document.getElementById("shiftModal").classList.remove("flex");
+        }
+
+        function handleShiftSubmit(event) {
+            event.preventDefault();
+            const editId = parseInt(document.getElementById("editIndex").value);
+            const dia = document.getElementById("modalDia").value;
+            const data = document.getElementById("modalData").value;
+            const periodo = document.getElementById("modalPeriodo").value;
+            const operador = document.getElementById("modalOperador").value;
+
+            const newShift = {
+                id: editId > 0 ? editId : Date.now(),
+                dia,
+                data,
+                periodo,
+                operador
+            };
+
+            if (editId > 0) {
+                const index = escalaData.findIndex(s => s.id === editId);
+                if (index !== -1) escalaData[index] = newShift;
+                showToast("Turno atualizado com sucesso!");
+            } else {
+                escalaData.push(newShift);
+                showToast("Novo turno adicionado com sucesso!");
+            }
+
+            closeShiftModal();
+            renderOperatorPills();
+            renderSummary();
+            filterTable();
+        }
+
+        function openOperatorDetailModal(operatorName) {
+            selectedModalOperator = operatorName;
+            const avatarUrl = getAvatarUrl(operatorName);
+            const opShifts = escalaData.filter(item => item.operador.split(" / ").map(s=>s.trim()).includes(operatorName));
+
+            document.getElementById("opDetailHeader").innerHTML = `
+                <img src="${avatarUrl}" class="w-12 h-12 rounded-full object-cover border-2 border-indigo-600">
+                <div>
+                    <h3 class="font-bold text-slate-900 dark:text-white text-base">${operatorName}</h3>
+                    <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">${opShifts.length} turnos escalados</p>
+                </div>
+            `;
+
+            const listContainer = document.getElementById("opDetailList");
+            listContainer.innerHTML = opShifts.map(s => `
+                <div class="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-xs flex justify-between items-center">
+                    <div>
+                        <span class="font-semibold text-slate-800 dark:text-slate-200">${s.dia} (${s.data})</span>
+                        <span class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold ${s.periodo === 'Manhã' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' : s.periodo === 'Noite' ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}">${s.periodo}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById("operatorDetailModal").classList.remove("hidden");
+            document.getElementById("operatorDetailModal").classList.add("flex");
+        }
+
+        function closeOperatorModal() {
+            document.getElementById("operatorDetailModal").classList.add("hidden");
+            document.getElementById("operatorDetailModal").classList.remove("flex");
+        }
+
+        function filterByOperatorFromModal() {
+            closeOperatorModal();
+            setOperatorFilter(selectedModalOperator);
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            document.getElementById("themeIcon").innerText = isDark ? "☀️" : "🌙";
+            document.getElementById("themeText").innerText = isDark ? "Claro" : "Escuro";
+        }
+
+        function showToast(msg, icon = "✨") {
+            const toast = document.getElementById("toast");
+            document.getElementById("toastMessage").innerText = msg;
+            document.getElementById("toastIcon").innerText = icon;
+
+            toast.classList.remove("translate-y-20", "opacity-0");
+            toast.classList.add("translate-y-0", "opacity-100");
+
+            setTimeout(() => {
+                toast.classList.remove("translate-y-0", "opacity-100");
+                toast.classList.add("translate-y-20", "opacity-0");
+            }, 3000);
+        }
+
+        // Inicialização
+        window.onload = function() {
+            renderOperatorPills();
+            renderTable();
+            renderSummary();
+        };
+    </script>
+<script>
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+            navigator.serviceWorker.register("sw.js").catch(() => {});
+        });
+    }
+</script>
+</body>
+</html>
